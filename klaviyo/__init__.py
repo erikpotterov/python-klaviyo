@@ -34,7 +34,7 @@ class Klaviyo(object):
             raise KlaviyoException('You must provide a public or private api token')
 
     def track(self, event, email=None, id=None, properties=None, customer_properties=None,
-        timestamp=None, ip_address=None, is_test=False):
+        timestamp=None, ip_address=None, service=None, is_test=False):
         
         if email is None and id is None:
             raise KlaviyoException('You must identify a user by email or ID.')
@@ -59,8 +59,17 @@ class Klaviyo(object):
             'time' : self._normalize_timestamp(timestamp),
         }
 
+        if service:
+            params['service'] = service
+
         if ip_address:
             params['ip'] = ip_address
+
+        print()
+        print("PARAMS")
+        print()
+        import pprint
+        pprint.pprint(params)
 
         query_string = self._build_query_string(params, is_test)
         return self._request('track', query_string)
@@ -291,6 +300,8 @@ class Klaviyo(object):
                 raise KlaviyoException('Public token is not defined')
 
             url = '{}/{}?{}'.format(self.api_server, path, params)
+            import ipdb
+            ipdb.set_trace()
             response = getattr(requests, method.lower())(url, headers=headers)
 
             return response.text == '1'
